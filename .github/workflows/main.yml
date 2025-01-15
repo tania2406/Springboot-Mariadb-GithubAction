@@ -1,0 +1,54 @@
+name: Spring Project
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: springbootdb
+          MYSQL_USER: root
+          MYSQL_PASSWORD: Iamtania
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17' # or your desired Java version
+          distribution: 'adopt'
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Run tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/springbootdb
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: Iamtania
+        run: mvn test
+      - name: Upload JAR file
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-spring-boot-app
+          path: target/*.jar
