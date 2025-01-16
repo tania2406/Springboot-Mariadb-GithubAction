@@ -16,14 +16,14 @@ jobs:
       mariadb:
         image: mariadb:latest
         env:
-          MYSQL_ROOT_PASSWORD: root
+          # MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: testdb
           MYSQL_USER: user
-          # MYSQL_PASSWORD: password
+          MYSQL_PASSWORD: password
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -proot"
+          --health-cmd="mysqladmin ping -h localhost -U user -p password"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
@@ -50,11 +50,12 @@ jobs:
         run: mvn clean install
 
       - name: Run tests
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/springbootdb
-          SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: Iamtania
+        # env:
+        #   SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/springbootdb
+        #   SPRING_DATASOURCE_USERNAME: root
+        #   SPRING_DATASOURCE_PASSWORD: Iamtania
         run: mvn test
+        
       - name: Upload JAR file
         uses: actions/upload-artifact@v4
         with:
